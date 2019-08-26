@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    save_scroll: false,
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="烹饪一道树莓派大餐—-私有云+网络监控二合一服务器在这个漫天飞“云”的时代，谁不想拥有一块属于自己的私有云，可是，当大家看到私有云服务器的价格也都失去了兴趣，身为学生的笔者，利用强大的树莓派，低成本打造了集网络监控、家庭NAS于一身的“智汇云”系统。原料:  树莓派 * 1 USB摄像头（最好是LINUX免驱） * 1 硬盘（并口串口头可以） * 1 路由器（12V或5V） * 1 易驱线（并口/">
+<meta name="keywords" content="树莓派,linux,Raspberry Pi,RPI,samba,yeelink,开源硬件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于树莓派的私有云+网络监控服务器">
+<meta property="og:url" content="http://bookshiyi.com/2014/09/07/e5-9f-ba-e4-ba-8e-e6-a0-91-e8-8e-93-e6-b4-be-e7-9a-84-e7-a7-81-e6-9c-89-e4-ba-91-e7-bd-91-e7-bb-9c-e7-9b-91-e6-8e-a7-e6-9c-8d-e5-8a-a1-e5-99-a8/index.html">
+<meta property="og:site_name" content="book诗意">
+<meta property="og:description" content="烹饪一道树莓派大餐—-私有云+网络监控二合一服务器在这个漫天飞“云”的时代，谁不想拥有一块属于自己的私有云，可是，当大家看到私有云服务器的价格也都失去了兴趣，身为学生的笔者，利用强大的树莓派，低成本打造了集网络监控、家庭NAS于一身的“智汇云”系统。原料:  树莓派 * 1 USB摄像头（最好是LINUX免驱） * 1 硬盘（并口串口头可以） * 1 路由器（12V或5V） * 1 易驱线（并口/">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/pc_power_switch.jpg-w800_wm">
+<meta property="og:image" content="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/pc_power_line-w800_wm">
+<meta property="og:image" content="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/pc_power.jpg-w800_wm">
+<meta property="og:image" content="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/usb_sata_rpi.jpg-w800_wm">
+<meta property="og:image" content="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/rpi_hdd_pcpower.jpg-w800_wm">
+<meta property="og:image" content="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/circuit%20_schematics.jpg-w800_wm">
+<meta property="og:image" content="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/smart_cloud.jpg-w800_wm">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%878.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%879.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8710.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8711.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8712.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8713.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8714.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8715.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8716.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8717.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8718.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8719.jpg">
+<meta property="og:updated_time" content="2019-08-26T16:07:50.758Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于树莓派的私有云+网络监控服务器">
+<meta name="twitter:description" content="烹饪一道树莓派大餐—-私有云+网络监控二合一服务器在这个漫天飞“云”的时代，谁不想拥有一块属于自己的私有云，可是，当大家看到私有云服务器的价格也都失去了兴趣，身为学生的笔者，利用强大的树莓派，低成本打造了集网络监控、家庭NAS于一身的“智汇云”系统。原料:  树莓派 * 1 USB摄像头（最好是LINUX免驱） * 1 硬盘（并口串口头可以） * 1 路由器（12V或5V） * 1 易驱线（并口/">
+<meta name="twitter:image" content="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/pc_power_switch.jpg-w800_wm">
+  <link rel="canonical" href="http://bookshiyi.com/2014/09/07/e5-9f-ba-e4-ba-8e-e6-a0-91-e8-8e-93-e6-b4-be-e7-9a-84-e7-a7-81-e6-9c-89-e4-ba-91-e7-bd-91-e7-bb-9c-e7-9b-91-e6-8e-a7-e6-9c-8d-e5-8a-a1-e5-99-a8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>基于树莓派的私有云+网络监控服务器 | book诗意</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">book诗意</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">岂止有点意思，简直book诗意。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">90</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">51</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">19</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-schedule">
+      
+    
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>日程表</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-sitemap">
+      
+    
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-commonweal">
+      
+    
+      
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+</div>
+    </header>
+
+    
+
+  <a href="https://github.com/bookshiyi" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://bookshiyi.com/2014/09/07/e5-9f-ba-e4-ba-8e-e6-a0-91-e8-8e-93-e6-b4-be-e7-9a-84-e7-a7-81-e6-9c-89-e4-ba-91-e7-bd-91-e7-bb-9c-e7-9b-91-e6-8e-a7-e6-9c-8d-e5-8a-a1-e5-99-a8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="book诗意">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="book诗意">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">基于树莓派的私有云+网络监控服务器
+
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2014-09-07 11:11:24" itemprop="dateCreated datePublished" datetime="2014-09-07T11:11:24+08:00">2014-09-07</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-08-27 00:07:50" itemprop="dateModified" datetime="2019-08-27T00:07:50+08:00">2019-08-27</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/互联网/" itemprop="url" rel="index"><span itemprop="name">互联网</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/互联网/开源硬件/" itemprop="url" rel="index"><span itemprop="name">开源硬件</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/互联网/开源硬件/树莓派/" itemprop="url" rel="index"><span itemprop="name">树莓派</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="烹饪一道树莓派大餐—-私有云-网络监控二合一服务器"><a href="#烹饪一道树莓派大餐—-私有云-网络监控二合一服务器" class="headerlink" title="烹饪一道树莓派大餐—-私有云+网络监控二合一服务器"></a>烹饪一道树莓派大餐—-私有云+网络监控二合一服务器</h4><pre><code>在这个漫天飞“云”的时代，谁不想拥有一块属于自己的私有云，可是，当大家看到私有云服务器的价格也都失去了兴趣，身为学生的笔者，利用强大的树莓派，低成本打造了集网络监控、家庭NAS于一身的“智汇云”系统。</code></pre><p><strong>原料:</strong></p>
+<ul>
+<li>树莓派 * 1</li>
+<li>USB摄像头（最好是LINUX免驱） * 1</li>
+<li>硬盘（并口串口头可以） * 1</li>
+<li>路由器（12V或5V） * 1</li>
+<li>易驱线（并口/串口转USB） * 1</li>
+<li>网线 * 1</li>
+<li>电脑ATX电源（非必须） * 1</li>
+<li>对技术狂热的心 * 1</li>
+</ul>
+<p><strong>炒：改装ATX电源</strong></p>
+<p><strong>STEP1</strong>：</p>
+<pre><code>找一个旧电脑上面的ATX电源，在开工之前我们有必要了解开关电源引脚的定义，如图1。可能有的童鞋会问为什么一定要用ATX电源，笔者在这里和大家说明一下，本系统并非一定要有ATX电源，只要能给树莓派、硬盘、路由器等设备提供足够的电流即可，之所以这样做，一方面考虑系统以后有更好的扩展性，另一方面电源线变少了，看起来也更加整洁（笔者有轻微强迫症和完美主义）。</code></pre><p><img src="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/pc_power_switch.jpg-w800_wm" alt></p>
+<p><strong>STEP2</strong>：</p>
+<pre><code>把多余的线用电烙铁拆下，引出下面几根线来，黑色 GND，红色 +5V，绿色 PS-ON，灰色 PW-OK，紫色 5VSB（可以留着以后用），还有一个就是硬盘的电源线（注意硬盘的电源接口，如果电源上没有串口硬盘的电源接口，恰好您用的又是串口硬盘，那么就会用到转接线了），如图2，</code></pre><p><img src="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/pc_power_line-w800_wm" alt></p>
+<pre><code>其他的线就可以拆下来了。经过简单改造便成了我们“智汇云”系统的电源了。</code></pre><p><strong>STEP3</strong>：</p>
+<pre><code>更换螺丝，把开关电源的两个对角的螺丝换成比较长的，这样做不仅固定了电源而且拆卸也不会太麻烦，如图3。</code></pre><p><img src="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/pc_power.jpg-w800_wm" alt></p>
+<p><strong>蒸：整机组装</strong></p>
+<p><strong>STEP1</strong>：</p>
+<pre><code>树莓派没有串口和并口硬盘的接口，那么就要借助易驱线打通硬盘和树莓派，如图4。</code></pre><p><img src="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/usb_sata_rpi.jpg-w800_wm" alt></p>
+<p><strong>STEP2</strong>：</p>
+<pre><code>感谢学校的大力支持，提供了这么好的“机箱”，首先在上面打好孔，依次固定好树莓派，硬盘，电源，并连好各类数据线和电源线，（网线一端连接树莓派，另一端连接路由器的LAN口）如图5、图6。</code></pre><p><img src="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/rpi_hdd_pcpower.jpg-w800_wm" alt></p>
+<pre><code>系统电源的连线图，（图6右下角，如果路由器是5V供电，请把电源的路由器单元更改为5V输出）开关控制整个系统的供电，5VSB不受开关的控制，只要电源连接上市电，就会产生稳定的5V。</code></pre><p><img src="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/circuit%20_schematics.jpg-w800_wm" alt>  </p>
+<pre><code>给大家来一张全景预览，如图。</code></pre><p><img src="https://bookshiyi.oss-cn-qingdao.aliyuncs.com/photo/2014/09/smart_cloud.jpg-w800_wm" alt></p>
+<p><strong>煮：**</strong>配置服务器的周边设备**</p>
+<p><strong>STEP1</strong>：</p>
+<pre><code>把硬盘在电脑上格式化成NTFS格式，这会比在树莓派上格式化快很多。</code></pre><p><strong>STEP2</strong>：</p>
+<pre><code>给树莓派分配静态的IP地址：系统上电，电脑连接路由器，有线或无线均可，并进入后台管理界面，查看客户端列表，找到树莓派，并复制其网卡的MAC地址，在“静态地址分配”这一栏点击“添加条目”，输入树莓派网卡的MAC和你想设定的IP地址，重启路由器，如图</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%878.jpg" alt></p>
+<p><strong>STEP3</strong>：</p>
+<pre><code>在PC端用SSH软件（如PuTTy）远程登录树莓派，默认用户名pi、密码raspberry。如图。</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%879.jpg" alt="图片9"></p>
+<p><strong>STEP4</strong>：</p>
+<pre><code>登陆之后，运行sudo fdisk -l，然后会显示已挂载的硬盘的情况，如图7。</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8710.jpg" alt></p>
+<pre><code>/dev/mmc是树莓派系统的分区，mmc指的是SD卡。/dev/sda就是我们插上的80GB硬盘了。</code></pre><p><strong>STEP5</strong>:</p>
+<pre><code>安装ntfs-3g模块，于是我们就能读写NTFS格式的硬盘了：</code></pre><p>apt-get install ntfs-3g</p>
+<p><strong>STEP6</strong>:</p>
+<pre><code>创建目录，以这个目录作为挂载点挂载硬盘。</code></pre><p>mkdir /media/software mkdir /media/materialmount -t auto /dev/sda2 /media/softwaremount -t auto /dev/sda5 /media/material</p>
+<p><strong>蒸：搭建基于SAMBA的文件服务器</strong></p>
+<p><strong>STEP1</strong>：</p>
+<pre><code>运行以下命令安装SAMBA</code></pre><p>sudo apt-get install samba sudo apt-get install samba-common-bin</p>
+<p><strong>STEP2</strong>：</p>
+<pre><code>备份并更改SAMBA设置</code></pre><p>cp /etc/samba/smb.conf /etc/samba/smb.conf.bak sudo nano /etc/samba/smb.conf</p>
+<pre><code>行首的＃表示这一行是注释，也就是说这一行的配置不会生效。首先来启动用户安全，按下CTRL-W然后输入”security”，来找到相关的选项。去掉“security = user”这一行前面的注释符号，按CTRL+V使光标移动到文本末尾，添加网络共享，数目取决于自己的需求。格式如下：</code></pre><p>[Cloud]                  //设置分享的目录的名称 comment = Test share path = /media/ valid users = @users force group = users create mask = 0660 directory mask = 0771 read only = no</p>
+<p>如图<img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8711.jpg" alt="图片11"></p>
+<pre><code>完成编辑之后，按CTRL+X，然后按y退出并保存编辑。
+
+把pi这个用户添加到SAMBA并重启SAMBA服务：</code></pre><p>sudo smbpasswd -a pi sudo service samba restart</p>
+<p><strong>STEP3</strong>：</p>
+<pre><code>测试网络存储功能，在计算机的上方地址栏输入树莓派的地址（上面设置过）：</code></pre><p>\\192.168.1.2</p>
+<pre><code>进入了树莓派的文件服务器界面，或点击网络找到树莓派，首次登录可能需要身份认证，默认用户名pi，密码raspberry，如图8。</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8712.jpg" alt></p>
+<p><strong>STEP4：</strong></p>
+<pre><code>不过不要高兴太早，如果重启了树莓派，你会发现原来挂载的硬盘不见了，那么就得重新手动挂载，不过，有了autofs就没问题了。</code></pre><p>sudo apt-get install autofs sudo nano /etc/auto.master</p>
+<pre><code>在auto.master下面加入一行：</code></pre><p>/media/ /etc/auto.ext-usb –timeout=10,defaults,user,exec,uid=1000</p>
+<pre><code>这样即便在树莓派重启过后也不会破坏配置了，如图</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8713.jpg" alt="图片13"> <strong>STEP5</strong>：</p>
+<pre><code>尽管树莓派的功耗极低，但是如果硬盘一直转的话不仅费电而且有损硬盘寿命，那么我们就利用hdparm这款软件让硬盘在空载的时候自动休眠，在有数据读写的时候自动恢复活跃状态。
+
+首先检查是否已经安装hdparm：</code></pre><p>sudo # hdparm -V</p>
+<pre><code>如果提示下面这样的信息，说明已安装成功安装。如图</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8714.jpg" alt="图片14"></p>
+<pre><code>如果不是如上结果请运行以下命令来安装hdparm：</code></pre><p>sudo emerge hdparm</p>
+<pre><code>运行后再次检查hdparm，若未安装重复以上步骤。
+
+进入系统初始化目录，创建硬盘休眠脚本：</code></pre><p>cd /etc/init.d sudo nano hdparm.sh</p>
+<pre><code>在脚本中按如下格式写入，设置超时值使硬盘进入睡眠模式（XXX代表驱动器名称，num值（不含方括号）表示驱动器决定在关闭主轴电机以节约能耗之前等待多长时间(没有磁盘操作)，值0表示&quot;关&quot;，值1到240被指定为5秒的倍数，也就是超时可以从5秒到20分钟，值241到251指定30分钟的1到11倍，也就是超时可以从30分钟到5.5个小时，值252表示超时21分钟，253设置一个销售商定义的超时，255表示21分15秒。）：</code></pre><p> hdparm -S[num] /dev/XXX</p>
+<pre><code>如图，设置成10分钟无动作硬盘自动休眠。</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8715.jpg" alt="图片15"></p>
+<p>为hdparm.sh设置可执行权限，并把脚本加入启动清单：</p>
+<p>sudo chmod 755 /etc/init.d/hdparm.sh sudo update-rc.d hdparm（.sh） defaults</p>
+<pre><code>可能会显示警告，忽略即可，并重新启动树莓派：</code></pre><p>sudo shutdown -r now</p>
+<p><strong>炖：搭建网络监控服务器</strong></p>
+<p><strong>STEP1：</strong></p>
+<pre><code>插好USB摄像头，运行如下命令查看树莓派当前已连接设备：</code></pre><p>ls /dev</p>
+<p>如图9。</p>
+<p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8716.jpg" alt="图片16"></p>
+<pre><code>video0就是摄像头在LINUX下的默认名称，如果没有显示的话，说明可能是LINUX下没有驱动，建议换几个摄像头试试。</code></pre><p><strong>STEP2：</strong></p>
+<pre><code>访问Yeelink，注册新账户并登陆，点击右上角的用户中心，可以得到API-KEY并复制，如图10。</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8717.jpg" alt="图片17"></p>
+<pre><code>在用户中心增加一个设备, 再为之增加一个图像传感器，添加完成后，在用户中心的设备管理中，找到设备ID并记录下来，同时记录传但其ID，如图11。</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8718.jpg" alt="图片18"></p>
+<p><strong>STEP2：</strong></p>
+<pre><code>安装和配置安装图片抓取软件fswebcam：</code></pre><p>sudo apt-get install fswebcam</p>
+<pre><code>在/home/pi下创建yeelink.sh并编辑：</code></pre><p>sudo nano yeelink.sh</p>
+<pre><code>写入如下内容并保存：</code></pre><p>sudo fswebcam -d /dev/video0 -r 320x240 –bottom-banner –title “RaspberryPi @ Yeelink” –no-timestamp /home/pi/yeelink.jpg curl –request POST –data-binary @”/home/pi/yeelink.jpg” –header “U-ApiKey: [API-KEY]“<a href="http://api.yeelink.net/v1.1/device/\[device\_id\]/sensor/\[sensor\_id\]/photos" target="_blank" rel="noopener">http://api.yeelink.net/v1.1/device/\[device\_id\]/sensor/\[sensor\_id\]/photos</a></p>
+<pre><code>蓝色部分替换为自己的API-KEY，红色部分替换为自己的设备ID，绿色部分替换为传感器ID。</code></pre><p><strong>STEP3：</strong></p>
+<pre><code>为yelink.sh增加可执行权限：</code></pre><p>sudo chmod +x yeelink.sh</p>
+<pre><code>并设置拍照上传的时间间隔：</code></pre><p>crontab -e</p>
+<pre><code>在最下面的一行加入如下内容, num值表示让树莓派隔多少分钟运行一次脚本（不含方括号），保存退出.</code></pre><p>*/[num] * * * * /home/pi/yeelink.sh</p>
+<pre><code>看一下我们网络监控器的效果吧，如图</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8719.jpg" alt="图片19"></p>
+<pre><code>我的监控服务器查看地址http://www.yeelink.net/devices/12126
+
+如果没有收到效果，官网有提供开发文档，大家可以仔细研究，肯定可以解决问题的。</code></pre><p><strong>至此，我们的大餐也就出炉了，抓紧享用吧！</strong></p>
+
+    </div>
+
+    
+    
+    
+      <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/" alt="book诗意 wechat" style="width: 200px; max-width: 100%;">
+  <div></div>
+</div>
+
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/树莓派/" rel="tag"># 树莓派</a>
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+            <a href="/tags/Raspberry-Pi/" rel="tag"># Raspberry Pi</a>
+          
+            <a href="/tags/RPI/" rel="tag"># RPI</a>
+          
+            <a href="/tags/samba/" rel="tag"># samba</a>
+          
+            <a href="/tags/yeelink/" rel="tag"># yeelink</a>
+          
+            <a href="/tags/开源硬件/" rel="tag"># 开源硬件</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2014/03/01/e5-9f-ba-e4-ba-8e8051-e5-8d-95-e7-89-87-e6-9c-ba-e7-9a-84-e4-ba-ba-e4-bd-93-e7-ba-a2-e5-a4-96-e5-8f-8a-e7-83-9f-e9-9b-be-e6-a3-80-e6-b5-8b-e6-8a-a5-e8-ad-a6-e7-b3-bb-e7-bb-9f/" rel="next" title="基于8051单片机的人体红外及烟雾检测报警系统">
+                <i class="fa fa-chevron-left"></i> 基于8051单片机的人体红外及烟雾检测报警系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2014/10/01/e5-9f-ba-e4-ba-8emsp430g2553-e7-9a-84-e5-85-a8-e8-87-aa-e5-8a-a8-e5-87-b8-e9-80-8f-e9-95-9c-e7-84-a6-e8-b7-9d-e6-b5-8b-e9-87-8f-e7-b3-bb-e7-bb-9f/" rel="prev" title="基于MSP430G2553的全自动凸透镜焦距测量系统">
+                基于MSP430G2553的全自动凸透镜焦距测量系统 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">book诗意</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-name">分类</span>
+        
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">90</span>
+        <span class="site-state-item-name">标签</span>
+        
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/bookshiyi" title="GitHub &rarr; https://github.com/bookshiyi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#烹饪一道树莓派大餐—-私有云-网络监控二合一服务器"><span class="nav-number">1.</span> <span class="nav-text">烹饪一道树莓派大餐—-私有云+网络监控二合一服务器</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">辽ICP备16002243号-2 </a>&copy; 2016 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">book诗意</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+<script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+
+
+
+  
+
+
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  if (CONFIG.page.isPost) {
+    bookmark.scrollToMark('auto', "#更多");
+  } else {
+    bookmark.loadBookmark();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+</body>
+</html>

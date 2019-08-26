@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    save_scroll: false,
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="1.功能设计1.1基本功能 预置任意波形 极性输出 波形：正弦波、三角波、锯齿波、方波、阶梯波、脉冲波等 频率：1HZ-10KHZ 幅值：1V-5V 偏移：0V-4V 步进：1HZ、10HZ、100HZ、1KHZ 占空比：0-99% 工作模式控制 电容触摸按键 外部脉冲计数/频率计 FLASH存储当前设置（掉电保存）  1.2扩展功能上位机参数/波形（串口）导入（支持保存）  波形：窄脉冲、高斯白">
+<meta name="keywords" content="msp430,ad5426,lm324,ne5532,信号发生器,波形发生器,电容触摸">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于MSP430的函数信号发生器设计">
+<meta property="og:url" content="http://bookshiyi.com/2016/01/19/e5-9f-ba-e4-ba-8emsp430-e7-9a-84-e5-87-bd-e6-95-b0-e4-bf-a1-e5-8f-b7-e5-8f-91-e7-94-9f-e5-99-a8-e8-ae-be-e8-ae-a1/index.html">
+<meta property="og:site_name" content="book诗意">
+<meta property="og:description" content="1.功能设计1.1基本功能 预置任意波形 极性输出 波形：正弦波、三角波、锯齿波、方波、阶梯波、脉冲波等 频率：1HZ-10KHZ 幅值：1V-5V 偏移：0V-4V 步进：1HZ、10HZ、100HZ、1KHZ 占空比：0-99% 工作模式控制 电容触摸按键 外部脉冲计数/频率计 FLASH存储当前设置（掉电保存）  1.2扩展功能上位机参数/波形（串口）导入（支持保存）  波形：窄脉冲、高斯白">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%871.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%872-1024x639.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%873-1.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%874.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%875-1.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%876-1.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%877-1.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%878-1.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%879-1.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8710.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8711.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8712.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/03/IMG_20150707_015430-1024x768.jpg">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/01/signal_generator_2.jpg">
+<meta property="og:updated_time" content="2019-08-26T16:07:50.765Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于MSP430的函数信号发生器设计">
+<meta name="twitter:description" content="1.功能设计1.1基本功能 预置任意波形 极性输出 波形：正弦波、三角波、锯齿波、方波、阶梯波、脉冲波等 频率：1HZ-10KHZ 幅值：1V-5V 偏移：0V-4V 步进：1HZ、10HZ、100HZ、1KHZ 占空比：0-99% 工作模式控制 电容触摸按键 外部脉冲计数/频率计 FLASH存储当前设置（掉电保存）  1.2扩展功能上位机参数/波形（串口）导入（支持保存）  波形：窄脉冲、高斯白">
+<meta name="twitter:image" content="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%871.png">
+  <link rel="canonical" href="http://bookshiyi.com/2016/01/19/e5-9f-ba-e4-ba-8emsp430-e7-9a-84-e5-87-bd-e6-95-b0-e4-bf-a1-e5-8f-b7-e5-8f-91-e7-94-9f-e5-99-a8-e8-ae-be-e8-ae-a1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>基于MSP430的函数信号发生器设计 | book诗意</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">book诗意</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">岂止有点意思，简直book诗意。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">90</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">51</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">19</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-schedule">
+      
+    
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>日程表</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-sitemap">
+      
+    
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-commonweal">
+      
+    
+      
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+</div>
+    </header>
+
+    
+
+  <a href="https://github.com/bookshiyi" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://bookshiyi.com/2016/01/19/e5-9f-ba-e4-ba-8emsp430-e7-9a-84-e5-87-bd-e6-95-b0-e4-bf-a1-e5-8f-b7-e5-8f-91-e7-94-9f-e5-99-a8-e8-ae-be-e8-ae-a1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="book诗意">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="book诗意">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">基于MSP430的函数信号发生器设计
+
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2016-01-19 18:37:53" itemprop="dateCreated datePublished" datetime="2016-01-19T18:37:53+08:00">2016-01-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-08-27 00:07:50" itemprop="dateModified" datetime="2019-08-27T00:07:50+08:00">2019-08-27</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/TI-MSP430/" itemprop="url" rel="index"><span itemprop="name">TI MSP430</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/TI-MSP430/单片机/" itemprop="url" rel="index"><span itemprop="name">单片机</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/TI-MSP430/单片机/嵌入式/" itemprop="url" rel="index"><span itemprop="name">嵌入式</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="1-功能设计"><a href="#1-功能设计" class="headerlink" title="1.功能设计"></a>1.功能设计</h4><h5 id="1-1基本功能"><a href="#1-1基本功能" class="headerlink" title="1.1基本功能"></a>1.1基本功能</h5><ul>
+<li>预置任意波形</li>
+<li>极性输出</li>
+<li>波形：正弦波、三角波、锯齿波、方波、阶梯波、脉冲波等</li>
+<li>频率：1HZ-10KHZ</li>
+<li>幅值：1V-5V</li>
+<li>偏移：0V-4V</li>
+<li>步进：1HZ、10HZ、100HZ、1KHZ</li>
+<li>占空比：0-99%</li>
+<li>工作模式控制</li>
+<li>电容触摸按键</li>
+<li>外部脉冲计数/频率计</li>
+<li>FLASH存储当前设置（掉电保存）</li>
+</ul>
+<h5 id="1-2扩展功能"><a href="#1-2扩展功能" class="headerlink" title="1.2扩展功能"></a>1.2扩展功能</h5><pre><code>上位机参数/波形（串口）导入（支持保存）
+
+波形：窄脉冲、高斯白噪声、调幅波形、调频波形</code></pre><h4 id="2-方案设计"><a href="#2-方案设计" class="headerlink" title="2.方案设计"></a>2.方案设计</h4><h5 id="2-1硬件方案"><a href="#2-1硬件方案" class="headerlink" title="2.1硬件方案"></a>2.1硬件方案</h5><h6 id="2-1-1主控芯片"><a href="#2-1-1主控芯片" class="headerlink" title="2.1.1主控芯片"></a>2.1.1主控芯片</h6><pre><code>MSP430系列单片机是美国德州仪器（TI）1996年开始推向市场的一种16 位超低功耗、具有精简指令集（RISC）的混合信号处理器（Mixed Signal Processor）
+
+MSP430单片机称之为混合信号处理器，是由于其针对实际应用需求，将多个不同功能 的模拟电路、数字电路模块和微处理器集成在一个芯片上，以提供“单片机”解决方案。 该系列单片机多应用于需要电池供电的便携式仪器仪表中。其低功耗、技术支持成熟、 性价比高等特点十分适合做为本设计的主控芯片。</code></pre><h6 id="2-1-2模数转换"><a href="#2-1-2模数转换" class="headerlink" title="2.1.2模数转换"></a>2.1.2模数转换</h6><pre><code>ADI公司生产的高速DAC芯片--AD5426，参数如下：8bit精度、50MHZ串行接口、10MHz乘法器带宽、四象限乘法、典型电压建立时间50ns。8bit的精度足够满足日常调试模拟电路的使用需求，50Mhz的SPI通信对于信号发生器来说也是绰绰有余，10Mhz的乘法器带宽为本设计中所需要的高速DA输出的要求做出了保障，50ns的快速建立电压也保证了高速输出的信号完整性。该系列DAC芯片还有10bit、12bit的高精度版本DAC，为以后的系统升级留下足够大的空间。</code></pre><h6 id="2-1-3增益调节"><a href="#2-1-3增益调节" class="headerlink" title="2.1.3增益调节"></a>2.1.3增益调节</h6><pre><code>NE5532是高性能低噪声双运算放大器（双运放）集成电路。与很多标准运放相似，但它具有更好的噪声性能，优良的输出驱动能力及相当高的小信号带宽，电源电压范围大等特点。因此很适合应用在高品质和专业音响设备、仪器、控制电路及电话通道放大器。10Mhz的增益带宽满足了高速DA信号输出的要求，双电源供电保障了信号可以单、双极性输出。</code></pre><h6 id="2-1-4显示模块"><a href="#2-1-4显示模块" class="headerlink" title="2.1.4显示模块"></a>2.1.4显示模块</h6><pre><code>采用LCD5110屏幕作为系统的显示模组，其原因如下：性价比高：LCD1602可以显示32个字符，而Nokia5110可以显示15个汉字，30个字符，Nokia5110裸屏仅8.8元； 接口简单:仅四根I/O线即可驱动，LCD1602需11根I/O线，LCD12864需12根；速度快：是LCD12864的20倍，是LCD1602的40倍； 低功耗：Nokia5110工作电压3.3V，正常显示时工作电流200uA以下，具有掉电模式，适合电池供电的便携式移动设备。</code></pre><h6 id="2-1-5参数输入"><a href="#2-1-5参数输入" class="headerlink" title="2.1.5参数输入"></a>2.1.5参数输入</h6><pre><code>占空比、频率、步进、波形选择通过两个机械式旋转编码器来调节，其优点是旋钮可以无限旋转，单片机每次只对其相对增量进行测量，即每次开机可以自定义数据的大小，另外其较长的寿命和舒适的手感阻尼，目前在仪器仪表、音响、录音棚、汽车娱乐系统等应用十分广泛。
+
+电容触摸按键用来调节单片机的工作模式：信号发生器/数字频率计，相较于机械式按键和电阻式触摸按键，电容式触摸按键不仅耐用，造价低廉，机构简单易于安装，防水防污，而且还能提供如滚轮、滑动条的功能，而且MSP430单片机内部集成了电容触摸的功能且官方提供了底层库，极大的提高了开发的速度降低了开发的成本和难度;
+
+旋钮式电位器通过求和运算电路来调节输出信号幅值、偏移量，这样的做法即实现了功能的同时减小了单片机的运算量，而且保证了信号的不失真。</code></pre><h6 id="2-1-6信号通道"><a href="#2-1-6信号通道" class="headerlink" title="2.1.6信号通道"></a>2.1.6信号通道</h6><pre><code>为屏蔽共模干扰采用卡扣型同轴电缆作为输入输出信号线。</code></pre><h5 id="2-2硬件框图"><a href="#2-2硬件框图" class="headerlink" title="2.2硬件框图"></a>2.2硬件框图</h5><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%871.png" alt="图片1"></p>
+<p>图1 系统硬件框图</p>
+<h5 id="2-3软件方案"><a href="#2-3软件方案" class="headerlink" title="2.3软件方案"></a>2.3软件方案</h5><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%872-1024x639.png" alt="图片2"></p>
+<p>图2 程序流程图</p>
+<h5 id="2-4-机壳设计"><a href="#2-4-机壳设计" class="headerlink" title="2.4 机壳设计"></a>2.4 机壳设计</h5><h6 id="2-4-1机壳设计"><a href="#2-4-1机壳设计" class="headerlink" title="2.4.1机壳设计"></a>2.4.1机壳设计</h6><pre><code>出于对系统运行的稳定性、易用性和使用者的人身安全的考虑，本设计采用了塑料外壳的设计，塑料外壳不仅绝缘而且重量较轻，既隔离了人体又不会引起内部短路，另外塑料外壳十分便于打孔，这样可以在研发阶段手工钻孔，快速验证设计方案的合理性，这在工业设计中模型验证阶段是十分必要的，以免在开模后发现问题引来不必要的麻烦。</code></pre><h6 id="2-4-2机身内部"><a href="#2-4-2机身内部" class="headerlink" title="2.4.2机身内部"></a>2.4.2机身内部</h6><pre><code>1.开关电源：该部分为高频高压部分，带有较强的电磁干扰，故将其放置在机身的角落，下方用四颗铜柱固定，脱离机壳底部，防止被短路和伤害使用者。
+
+2.主控单元：该部分为低压低频部分，同样在主板底部用铜柱支撑起来，板子的接口采用了3pin，4pin，8pin的防呆接口设计，这样更便于研发人员的调试和升级。</code></pre><h6 id="2-4-3人机交互"><a href="#2-4-3人机交互" class="headerlink" title="2.4.3人机交互"></a>2.4.3人机交互</h6><pre><code>该部分被固定在前面板，通过打孔的方式从机壳的内部伸出来。为了提高系统的可靠性，所有的旋钮、按键、插口都使用了外卡螺母的设计，这样可以避免人机接口因为经常被触碰到而产生松动的现象。在内部与主控板之间使用排线连接，避免了走线凌乱的现象。</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%873-1.jpg" alt="图片3"></p>
+<p>图3 机壳结构设计</p>
+<h5 id="2-5前面板设计"><a href="#2-5前面板设计" class="headerlink" title="2.5前面板设计"></a>2.5前面板设计</h5><pre><code>为提高系统的易用性，前面板使用了中英双语的方式标注器件的功能，同时使用了紫-蓝渐变的方式作为底色，紫色部分与整个机身的相一致，蓝色部分又带有神秘的科技感，使用渐变的方式又不会使用户感觉面板设计很突兀，柔和的过度会给用户带来一种十分素雅的感受。</code></pre><p>前面板的设计与整个机身配合非常协调和有序，却又不显得十分呆板，简约、灵动的设计风格，十分易用的界面，为人机交互和用户体验打下了良好基础。</p>
+<p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%874.png" alt="图片4"></p>
+<p>图4 2D渲染图</p>
+<p><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%875-1.jpg" alt="图片5"></p>
+<p>图5 实物图</p>
+<hr>
+<h4 id="3-实际效果"><a href="#3-实际效果" class="headerlink" title="3.实际效果 "></a>3.实际效果 <img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%876-1.jpg" alt="图片6"></h4><p>图6 100HZ正弦波输出</p>
+<h4 id><a href="#" class="headerlink" title></a><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%877-1.jpg" alt="图片7"></h4><p>图7 10Khz 方波输出</p>
+<h4 id="-1"><a href="#-1" class="headerlink" title></a><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%878-1.jpg" alt="图片8"></h4><p>图8 76hz 锯齿波输出</p>
+<h4 id="-2"><a href="#-2" class="headerlink" title></a><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%879-1.jpg" alt="图片9"></h4><p>图9 76hz三角波输出</p>
+<h4 id="-3"><a href="#-3" class="headerlink" title></a><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8710.png" alt="图片10"></h4><p>图10 460hz窄脉冲输出</p>
+<h4 id="-4"><a href="#-4" class="headerlink" title></a><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8711.png" alt="图片11"></h4><p>图11 100hz单极性正弦波输出</p>
+<h4 id="-5"><a href="#-5" class="headerlink" title></a><img src="http://oarap.org/wp-content/uploads/2016/03/%E5%9B%BE%E7%89%8712.png" alt="图片12"></h4><p>图12 在Vpp=230mv情况下100hz单极性三角波输出</p>
+<hr>
+<h4 id="4-应用场合"><a href="#4-应用场合" class="headerlink" title="4.应用场合"></a>4.应用场合</h4><pre><code>该系统主要作为实验仪器使用，常用在音响设备开发、电缆故障定位系统研究、放大电路信号源等方向，简介易用的设计可以更好的帮助研发人员加快研发节奏。</code></pre><hr>
+<h4 id="5-收获"><a href="#5-收获" class="headerlink" title="5.收获"></a>5.收获</h4><pre><code>在本学期做了三个工程项目，感触良多，从第一个项目开始的时候，刚刚接触KEIL，连最基本的建工程操作都漏洞百出，后来慢慢的了解了利用搜索引擎工具查阅资料，对IDE的掌握也越来越熟练，同时也发现：理论指导实践，实践出真知。当我们一味盲目的操作和编写代码的时候，没有理论的指导，这样的效率简直低的可怕，很有可能就是一个寄存器的设置不正确却因为没有仔细阅读数据手册而导致项目延误很多天；我们曾经对自己傲人的考试分数沾沾自喜，而如今想起来都忍不住为当初那点纸上谈兵的无知而脸红，理论存在的意义不是考试不是考研不是分数不是死记硬背，理论是前辈们辛辛苦苦总结出的定理、公式，其目的不是将规律抽象出来而已，而是为了更好的理解和传播前辈的只是，真正的意义是带着理论走到实践中，让我们后人有机会快速的站在巨人的肩膀上，只是为了向前迈一步。</code></pre><hr>
+<h4 id="6-遗憾与骄傲"><a href="#6-遗憾与骄傲" class="headerlink" title="6.遗憾与骄傲"></a>6.遗憾与骄傲</h4><ul>
+<li><p>主控芯片选型比较盲目，直接使用了熟悉的MSP430（主要是由底层库，以后会把底层库整理完整后分享给大家），到了后期才发现，导致信号频率上不去的原因不是spi通信，而是主控的运算能力，因为ad5426能支持50M带宽的spi通信，而msp430g2553的最高频率为16mhz，其中还不包括运算时间，中断处理时间，spi寄存器准备时间，这样算下来速度实在是低得可怜，在这种高速度运算的项目里，我想fpga或者dsp应该才是更好的选择。</p>
+</li>
+<li><p>前面板结构不够合理，两个大的数字电位器旋钮应该横向在一条水平线上，然后右侧的两个电位器旋钮在一条垂直线上，这样使用起来更顺手，看起来也更符合人类的审美。</p>
+</li>
+<li><p>在这种高速信号的设计中，PCB的重要性就体现出来，首先可以任意布线，解决信号在高速传输过程中引起的阻抗不匹配问题，提高通信速率使其接近50Mhz，另外更有利于减小机体体积，系统的重复性也就越高；尽管有原理图的存在也远远达不到PCB所带来的高重复性。</p>
+</li>
+<li><p>本次项目是至今为止最为系统的一次，有着完整的文档，流程图硬件框图，看起来更像是完整的项目了，其实关于信号发生器这已经做了第三个了，前两个都是基于DAC0832的，软件使用了自制的msp430函数库，优秀的软件结构使得系统的性能得到了最大化利用，硬件上主要风格是大量使用了带有防呆插头的排线，这样的好处是便于问题的排查，也便于器件的更换。</p>
+</li>
+<li><p>精心打磨每一个细节，包括前面板每一个开窗、打孔，竭力做到丝毫不差。良好的交互界面和易懂的交互逻辑。简洁大方的机身和外观。就是为了证明，无论何时，优秀的设计都是必要的。</p>
+<p>▼十分简陋的第一版信号发生器，主要的特点是左下角的摇杆，点按是波形切换，上下推实现幅值大小的设置，左右腿实现频率大小的调整。</p>
+</li>
+</ul>
+<h4 id="-6"><a href="#-6" class="headerlink" title></a><img src="http://oarap.org/wp-content/uploads/2016/03/IMG_20150707_015430-1024x768.jpg" alt="IMG_20150707_015430"></h4><p>▼第二版的信号发生器 <img src="http://oarap.org/wp-content/uploads/2016/01/signal_generator_2.jpg" alt="signal_generator_2"></p>
+<hr>
+<h4 id="7-后记"><a href="#7-后记" class="headerlink" title="7.后记"></a>7.后记</h4><pre><code>时至2016-03，项目还没有彻底结束，目前主要问题/未完成功能有：</code></pre><ul>
+<li>ADC采集并转化为有效的幅值和偏移电压信息</li>
+<li>flash存储参数</li>
+<li>外部脉冲计数器/频率计</li>
+<li>//自定义波形，通过串口发送</li>
+<li>//串口上位机设计（基本不可能了）</li>
+</ul>
+<hr>
+
+    </div>
+
+    
+    
+    
+      <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/" alt="book诗意 wechat" style="width: 200px; max-width: 100%;">
+  <div></div>
+</div>
+
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/msp430/" rel="tag"># msp430</a>
+          
+            <a href="/tags/ad5426/" rel="tag"># ad5426</a>
+          
+            <a href="/tags/lm324/" rel="tag"># lm324</a>
+          
+            <a href="/tags/ne5532/" rel="tag"># ne5532</a>
+          
+            <a href="/tags/信号发生器/" rel="tag"># 信号发生器</a>
+          
+            <a href="/tags/波形发生器/" rel="tag"># 波形发生器</a>
+          
+            <a href="/tags/电容触摸/" rel="tag"># 电容触摸</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2016/01/01/e5-9f-ba-e4-ba-8eproteus-e4-bb-bf-e7-9c-9f-e7-9a-8489c51-e6-b8-a9-e5-ba-a6-e6-a3-80-e6-b5-8b-e6-8e-a7-e5-88-b6-e7-b3-bb-e7-bb-9f/" rel="next" title="基于Proteus仿真的89c51温度检测控制系统">
+                <i class="fa fa-chevron-left"></i> 基于Proteus仿真的89c51温度检测控制系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2016/01/25/e5-9f-ba-e4-ba-8ematlab-e7-9a-84-e5-bf-83-e7-94-b5-e4-bf-a1-e5-8f-b7-e5-8e-bb-e5-99-aa-e7-b3-bb-e7-bb-9f-e8-ae-be-e8-ae-a1/" rel="prev" title="基于Matlab的心电信号去噪系统设计">
+                基于Matlab的心电信号去噪系统设计 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">book诗意</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-name">分类</span>
+        
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">90</span>
+        <span class="site-state-item-name">标签</span>
+        
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/bookshiyi" title="GitHub &rarr; https://github.com/bookshiyi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-功能设计"><span class="nav-number">1.</span> <span class="nav-text">1.功能设计</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-1基本功能"><span class="nav-number">1.1.</span> <span class="nav-text">1.1基本功能</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-2扩展功能"><span class="nav-number">1.2.</span> <span class="nav-text">1.2扩展功能</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-方案设计"><span class="nav-number">2.</span> <span class="nav-text">2.方案设计</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1硬件方案"><span class="nav-number">2.1.</span> <span class="nav-text">2.1硬件方案</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#2-1-1主控芯片"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1主控芯片</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-1-2模数转换"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2模数转换</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-1-3增益调节"><span class="nav-number">2.1.3.</span> <span class="nav-text">2.1.3增益调节</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-1-4显示模块"><span class="nav-number">2.1.4.</span> <span class="nav-text">2.1.4显示模块</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-1-5参数输入"><span class="nav-number">2.1.5.</span> <span class="nav-text">2.1.5参数输入</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-1-6信号通道"><span class="nav-number">2.1.6.</span> <span class="nav-text">2.1.6信号通道</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2硬件框图"><span class="nav-number">2.2.</span> <span class="nav-text">2.2硬件框图</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3软件方案"><span class="nav-number">2.3.</span> <span class="nav-text">2.3软件方案</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-4-机壳设计"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 机壳设计</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#2-4-1机壳设计"><span class="nav-number">2.4.1.</span> <span class="nav-text">2.4.1机壳设计</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-4-2机身内部"><span class="nav-number">2.4.2.</span> <span class="nav-text">2.4.2机身内部</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-4-3人机交互"><span class="nav-number">2.4.3.</span> <span class="nav-text">2.4.3人机交互</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-5前面板设计"><span class="nav-number">2.5.</span> <span class="nav-text">2.5前面板设计</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-实际效果"><span class="nav-number">3.</span> <span class="nav-text">3.实际效果 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#null"><span class="nav-number">4.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-1"><span class="nav-number">5.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-2"><span class="nav-number">6.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-3"><span class="nav-number">7.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-4"><span class="nav-number">8.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-5"><span class="nav-number">9.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-应用场合"><span class="nav-number">10.</span> <span class="nav-text">4.应用场合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-收获"><span class="nav-number">11.</span> <span class="nav-text">5.收获</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-遗憾与骄傲"><span class="nav-number">12.</span> <span class="nav-text">6.遗憾与骄傲</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-6"><span class="nav-number">13.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-后记"><span class="nav-number">14.</span> <span class="nav-text">7.后记</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">辽ICP备16002243号-2 </a>&copy; 2016 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">book诗意</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+<script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+
+
+
+  
+
+
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  if (CONFIG.page.isPost) {
+    bookmark.scrollToMark('auto', "#更多");
+  } else {
+    bookmark.loadBookmark();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+</body>
+</html>

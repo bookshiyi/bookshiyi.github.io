@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    save_scroll: false,
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="实测的心电信号中常常存在一些强干扰和噪声，如何在强背景干扰和噪声下准确提取出有用的心电信号，是心脏类疾病预测和诊断的一个重要内容。本文提出了一种心电信号的去噪系统设计方法，对原始心电信号进行频谱分析后，确定噪声主要存在的频带：原始信号中主要包含了极强的50Hz工频干扰、低频肌电干扰带来的基线漂移、白噪声。设计低通滤波器和陷波器，对原始信号进行预处理，旨在滤除信号中的高频噪声和工频干扰；设计算法，对">
+<meta name="keywords" content="DSP,Matlab,基线漂移,小波去噪,心电信号,数字信号处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Matlab的心电信号去噪系统设计">
+<meta property="og:url" content="http://bookshiyi.com/2016/01/25/e5-9f-ba-e4-ba-8ematlab-e7-9a-84-e5-bf-83-e7-94-b5-e4-bf-a1-e5-8f-b7-e5-8e-bb-e5-99-aa-e7-b3-bb-e7-bb-9f-e8-ae-be-e8-ae-a1/index.html">
+<meta property="og:site_name" content="book诗意">
+<meta property="og:description" content="实测的心电信号中常常存在一些强干扰和噪声，如何在强背景干扰和噪声下准确提取出有用的心电信号，是心脏类疾病预测和诊断的一个重要内容。本文提出了一种心电信号的去噪系统设计方法，对原始心电信号进行频谱分析后，确定噪声主要存在的频带：原始信号中主要包含了极强的50Hz工频干扰、低频肌电干扰带来的基线漂移、白噪声。设计低通滤波器和陷波器，对原始信号进行预处理，旨在滤除信号中的高频噪声和工频干扰；设计算法，对">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%871-1.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%872-1.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%875-1.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%876-1.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%877-1.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%878-1.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%879-1.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/b1.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8711.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8712.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8714.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8715.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8721.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8722.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8724.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/b2.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8727.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/b3.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8728.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8729.png">
+<meta property="og:image" content="http://oarap.org/wp-content/uploads/2016/02/QQ%E6%8B%BC%E9%9F%B3%E6%88%AA%E5%9B%BE%E6%9C%AA%E5%91%BD%E5%90%8D.png">
+<meta property="og:updated_time" content="2019-08-26T16:07:50.765Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于Matlab的心电信号去噪系统设计">
+<meta name="twitter:description" content="实测的心电信号中常常存在一些强干扰和噪声，如何在强背景干扰和噪声下准确提取出有用的心电信号，是心脏类疾病预测和诊断的一个重要内容。本文提出了一种心电信号的去噪系统设计方法，对原始心电信号进行频谱分析后，确定噪声主要存在的频带：原始信号中主要包含了极强的50Hz工频干扰、低频肌电干扰带来的基线漂移、白噪声。设计低通滤波器和陷波器，对原始信号进行预处理，旨在滤除信号中的高频噪声和工频干扰；设计算法，对">
+<meta name="twitter:image" content="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%871-1.png">
+  <link rel="canonical" href="http://bookshiyi.com/2016/01/25/e5-9f-ba-e4-ba-8ematlab-e7-9a-84-e5-bf-83-e7-94-b5-e4-bf-a1-e5-8f-b7-e5-8e-bb-e5-99-aa-e7-b3-bb-e7-bb-9f-e8-ae-be-e8-ae-a1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>基于Matlab的心电信号去噪系统设计 | book诗意</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">book诗意</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">岂止有点意思，简直book诗意。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">90</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">51</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">19</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-schedule">
+      
+    
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>日程表</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-sitemap">
+      
+    
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-commonweal">
+      
+    
+      
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+</div>
+    </header>
+
+    
+
+  <a href="https://github.com/bookshiyi" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://bookshiyi.com/2016/01/25/e5-9f-ba-e4-ba-8ematlab-e7-9a-84-e5-bf-83-e7-94-b5-e4-bf-a1-e5-8f-b7-e5-8e-bb-e5-99-aa-e7-b3-bb-e7-bb-9f-e8-ae-be-e8-ae-a1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="book诗意">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="book诗意">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">基于Matlab的心电信号去噪系统设计
+
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2016-01-25 15:16:47" itemprop="dateCreated datePublished" datetime="2016-01-25T15:16:47+08:00">2016-01-25</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-08-27 00:07:50" itemprop="dateModified" datetime="2019-08-27T00:07:50+08:00">2019-08-27</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数字信号处理/" itemprop="url" rel="index"><span itemprop="name">数字信号处理</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数字信号处理/算法/" itemprop="url" rel="index"><span itemprop="name">算法</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <pre><code>实测的心电信号中常常存在一些强干扰和噪声，如何在强背景干扰和噪声下准确提取出有用的心电信号，是心脏类疾病预测和诊断的一个重要内容。本文提出了一种心电信号的去噪系统设计方法，对原始心电信号进行频谱分析后，确定噪声主要存在的频带：原始信号中主要包含了极强的50Hz工频干扰、低频肌电干扰带来的基线漂移、白噪声。设计低通滤波器和陷波器，对原始信号进行预处理，旨在滤除信号中的高频噪声和工频干扰；设计算法，对信号中的中低频白噪声进行抑制；设计基线补偿算法，消除信号中低频的基线漂移现象；仿真结果表明，20组差异明显的实测的带噪心电信号经本系统处理后，得到的信号波形均十分清晰，且信号的特征值保留完整，为临床医生的判断提供了有利的依据。</code></pre><h3 id="0-引言"><a href="#0-引言" class="headerlink" title="0       引言"></a>0       引言</h3><pre><code>目前，全球心脏类疾病的发病率和死亡率一直居高不下,一直是当代人类健康的首要威胁之一，所以心电信号在医学领域就变得有非常重要的意义，但是由于心电信号本身十分较弱（10pV~5mV）,难以检测，再加之人体自身的肌电干扰、室内的工频干扰以及周围其他的电磁干扰，导致在传感器输出端心电信号几乎淹没在噪声里面，所以对心电信号分析和去噪具有很高的实用价值和重要意义。
+
+本文设计了一套心电心号的处理系统，包括：线性相位FIR低通滤波器和陷波器，抑制工频干扰及其他噪声,对原始心电信号进行预处理；小波去噪，对原始信号进行小波分解后，进行阈值处理，再做小波重构处理，以此去除信号中的白噪声；基线矫正：通过计算信号变化趋势的方法来消除信号中的线性趋势。最终可以把绝大多数的原始心电信号较为完整的提取出来且几乎不损失信号的特征值。</code></pre><h3 id="1-心电信号频谱分析"><a href="#1-心电信号频谱分析" class="headerlink" title="1       心电信号频谱分析"></a>1       心电信号频谱分析</h3><pre><code>通过对心电信号的频谱分析，找出其噪声和干扰的主要分布频带范围，以此来设计相应的滤波器。</code></pre><h4 id="1-1-心电心号的读取"><a href="#1-1-心电心号的读取" class="headerlink" title="1.1         心电心号的读取"></a>1.1         心电心号的读取</h4><pre><code>目前，在国际上的公认可用作标准心电数据库有三个，分别是美国麻省理工学院的MIT-BIH 数据库，[美国心脏学会](http://baike.baidu.com/subview/10276144/10439505.htm)的AHA数据库和欧洲AT-T心电数据库。近年来，美国麻省理工学院的MIT-BIH 数据库广泛应用于医疗行业。
+
+从MIT-BIH数据库下载20组心电信号数据，通过MATLAB中的xlsread函数将表格形式的原始数据导入到工作空间。</code></pre><h4 id="1-2-心电心号频谱分析"><a href="#1-2-心电心号频谱分析" class="headerlink" title="1.2         心电心号频谱分析"></a>1.2         心电心号频谱分析</h4><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%871-1.png" alt="图片1"></p>
+<p>图1 原始心电信号的时域波形和频谱图</p>
+<p>Fig. 1 The original ecg signal in the time domain waveform and spectrum diagram</p>
+<pre><code>通过对原始信号的时域波形观察可以发现：信号中的高频噪声较多，信号大多被淹没在噪声中，并且伴有基线漂移的现象，频谱图中可以发现信号在50Hz的频率处出现了极强烈噪声，据分析为工频干扰。</code></pre><h3 id="2-去噪系统设计"><a href="#2-去噪系统设计" class="headerlink" title="2       去噪系统设计"></a>2       去噪系统设计</h3><pre><code>根据对实测的原始心电信号进行频谱分析后，提出了以下设计方案：FIR低通滤波器，滤除信号中100HZ以上的高频噪声；FIR工频陷波器，抑制信号中的50HZ工频干扰；小波去噪：滤除信号中的白噪声；基线矫正：矫正由肌电干扰等带来的基线漂移现象。系统结构框图如图2所示：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%872-1.png" alt="图片2"></p>
+<p>图2 系统结构框图</p>
+<p>Fig. 2   system block diagram</p>
+<h4 id="2-1-FIR滤波器"><a href="#2-1-FIR滤波器" class="headerlink" title="2.1         FIR滤波器"></a>2.1         FIR滤波器</h4><pre><code>FIR滤波器，全称Finite Impulse Response，有限长单位冲激响应滤波器，又称为非递归型滤波器，是数字信号处理系统中最基本的元件，它能够在保证任意幅频特性的情况下具有严格的线性相频特性，同时其单位抽样响应是有限长的，因而滤波器是稳定的系统。因此，FIR滤波器在通信、图像处理、模式识别等领域都有着广泛的应用。</code></pre><h5 id="2-1-1-窗函数法设计思路"><a href="#2-1-1-窗函数法设计思路" class="headerlink" title="2.1.1        窗函数法设计思路"></a>2.1.1        窗函数法设计思路</h5><pre><code>窗函数设计滤波器【文献1】的基本思想是，首先根据要求选择一个适当的低通滤波器，因为其脉冲响应是非因果且是无限长的，用最优化窗结构窗函数来截取它的脉冲响应，从而得到线性相位和因果的FIR滤波器。
+
+a)根据给定要求的理想频率响应 ![图片3](http://oarap.org/wp-content/uploads/2016/02/图片3-1.png)求出![图片4](http://oarap.org/wp-content/uploads/2016/02/图片4-1.png)</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%875-1.png" alt="图片5"></p>
+<pre><code>b)用一个有限时长的“窗函数”序列 将 截断，窗的点数是N点。阶段后的序列为![图片10](http://oarap.org/wp-content/uploads/2016/02/图片10.png)</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%876-1.png" alt="图片6"></p>
+<p>窗的点数N及窗的形状是两个极重要的参数。</p>
+<pre><code>d)求出加窗后实际的频率响应![图片8](http://oarap.org/wp-content/uploads/2016/02/图片8-1.png)</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%877-1.png" alt="图片7"></p>
+<p>并反复检验<img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%878-1.png" alt="图片8"> 是否满足<img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%879-1.png" alt="图片9"> ，不满足则改正窗形状或窗长的点数N。</p>
+<p>表1 常见窗函数基本参数的比较【来自文献1】</p>
+<p>Tab. 1 The comparison of common basic parameters window function</p>
+<p><img src="http://oarap.org/wp-content/uploads/2016/02/b1.png" alt="b1"></p>
+<pre><code>常见窗函数的参数如表1所示，本文设计中使用了凯泽窗来设计FIR滤波器，凯泽窗是接近最优化窗结构的窗函数，它可以根据不同的参数调整滤波器滤波器的各项指标，而矩形窗、汉宁窗、海明窗和布莱克曼窗等窗的形状是固定的，一旦选取了某种窗函数，设计出的FIR滤波器在阻带的衰减就确定了。凯泽窗是一种应用广泛的可调窗，它可以通过改变窗函数的形状来控制窗函数旁瓣的大小，从而可以在设计中用滤波器的衰减指标来确定窗函数的形状。</code></pre><h5 id="2-1-2-FIR低通滤波器设计"><a href="#2-1-2-FIR低通滤波器设计" class="headerlink" title="2.1.2        FIR低通滤波器设计"></a>2.1.2        FIR低通滤波器设计</h5><pre><code>理想线性相位低通滤波器的频率响应：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8711.png" alt="图片11"></p>
+<pre><code>单位抽样响应：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8712.png" alt="图片12"></p>
+<pre><code>利用matlab中的FDATool【文献2】工具，设置了滤波器的阶数N=20，通带截止频率95HZ，阻带截止频率100Hz，Beat=0.5，通过凯瑟窗方法得到的滤波器特性如图3所示：![图片13](http://oarap.org/wp-content/uploads/2016/02/图片13.png)</code></pre><p>图3 低通FIR滤波器幅频特性曲线</p>
+<p>Fig. 3 Low pass FIR filter amplitude-frequency characteristic curve</p>
+<h5 id="2-1-3-FIR工频陷波器设计"><a href="#2-1-3-FIR工频陷波器设计" class="headerlink" title="2.1.3        FIR工频陷波器设计"></a>2.1.3        FIR工频陷波器设计</h5><pre><code>理想线性相位带阻滤波器的频率响应：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8714.png" alt="图片14"></p>
+<pre><code>单位抽样响应：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8715.png" alt="图片15"></p>
+<pre><code>由于市电电压的频率为50Hz，它会以电磁波的辐射形式，对人们的日常生活造成干扰，我们把这种干扰称之为工频干扰，故设计一种陷波器，滤除心电信号中的50Hz干扰，
+
+利用matlab中的FDATool工具，设置了滤波器的阶数N=60，Fc1=47Hz，Fc2=53Hz，Beta=0.3通过凯瑟窗方法得到的滤波器特性如图4所示：![图片16](http://oarap.org/wp-content/uploads/2016/02/图片16.png)</code></pre><p>图4 50Hz的FIR陷波器幅频特性曲线</p>
+<p>Fig. 4 50 Hz FIR trap amplitude-frequency characteristic curve</p>
+<h4 id="2-2-小波去噪"><a href="#2-2-小波去噪" class="headerlink" title="2.2         小波去噪"></a>2.2         小波去噪</h4><pre><code>由于实测心电信号的信噪比较低，其特征波与部分干扰信号的频带相互重叠，普通的频带滤波方法不能有效的将两者完全分离。小波变换在传统的傅立叶变换基础上发展而来，具有多尺度多分辨率的优异特性和良好的时频局部化特性，所以小波去噪更适合处理心电信号与干扰信号频带重叠的滤波问题。</code></pre><h5 id="2-2-1-离散小波变换及重构"><a href="#2-2-1-离散小波变换及重构" class="headerlink" title="2.2.1              离散小波变换及重构"></a>2.2.1              离散小波变换及重构</h5><pre><code>信号 ![图片17](http://oarap.org/wp-content/uploads/2016/02/图片17.png)的连续小波变换为：![图片18](http://oarap.org/wp-content/uploads/2016/02/图片18.png)
+
+对尺度因子a和平移参数b进行如下的离散采样：![图片19](http://oarap.org/wp-content/uploads/2016/02/图片19.png)
+
+则小波 ![图片20](http://oarap.org/wp-content/uploads/2016/02/图片20.png)变为：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8721.png" alt="图片21"></p>
+<pre><code>离散小波变换定义为：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8722.png" alt="图片22"></p>
+<pre><code>由离散小波变换 ![图片23](http://oarap.org/wp-content/uploads/2016/02/图片23.png)重构出原始信号 ：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8724.png" alt="图片24"></p>
+<pre><code>上式中 ![图片26](http://oarap.org/wp-content/uploads/2016/02/图片26.png)为![图片26](http://oarap.org/wp-content/uploads/2016/02/图片26.png) 的对偶框架。</code></pre><h4 id="2-2-2-小波去噪算法设计"><a href="#2-2-2-小波去噪算法设计" class="headerlink" title="2.2.2              小波去噪算法设计"></a>2.2.2              小波去噪算法设计</h4><pre><code>首先对原始信号进行小波分解，经过累试发现dB6作为小波基对于分解带噪心电信号的效果较好，分解层数为5的时候，去噪效果较好，在保证了去噪效果的情况下节约了运算时间，各子带的频率范围如表2所示：</code></pre><p>表2 5尺度分解子带系数的频率范围</p>
+<p>Tab. 2 The frequency range of scale subband coefficients</p>
+<p><img src="http://oarap.org/wp-content/uploads/2016/02/b2.png" alt="b2"></p>
+<pre><code>在阈值处理及重构阶段采用如下参数：使用minimax原则【文献4】（极值阈值估计）产生阈值， minimax方法比较保守，对噪声在信号的高频段分布较少时去噪效果较好，可以将微弱的信号提取出来；并进行硬阈值处理，使得波形变得硬朗而非平滑；阈值处理根据每层小波噪声水平进行调整，这样的方法可以适应多变且复杂的心电信号，使得滤波系统具有一定的普遍性。运用MATLAB中的小波工具箱，图形化操作的方式小波分解心电信号，如图4所示为心电信号在5尺度小波分解下的波形：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8727.png" alt="图片27"></p>
+<p>图5 5尺度下dB6小波分解信号的波形</p>
+<p>Fig. 5 5 scales dB6 wavelet decomposition signal waveform</p>
+<h4 id="2-3-基线矫正"><a href="#2-3-基线矫正" class="headerlink" title="2.3         基线矫正"></a>2.3         基线矫正</h4><pre><code>基线漂移是因呼吸、肢体活动等引起的ECG信号上下浮动的现象，常规的心电图仪长采用无源RC滤波的方式来抑制基线漂移，即病人保持不动，待基线稳定以后再进行测量，显然，这样的做法对于病人进行长期的监护是不合适的【文献6】。</code></pre><h5 id="2-3-1-基线矫正的原理"><a href="#2-3-1-基线矫正的原理" class="headerlink" title="2.3.1              基线矫正的原理"></a>2.3.1              基线矫正的原理</h5><pre><code>基线漂移的频率极低，普通的高通滤波器很难到达预期的滤波效果，所以提出了一种根据小波变换对信号进行长周期趋势估计【文献3】，再进行基线漂移的补偿。</code></pre><h5 id="2-3-2-基线矫正算法的设计"><a href="#2-3-2-基线矫正算法的设计" class="headerlink" title="2.3.2              基线矫正算法的设计"></a>2.3.2              基线矫正算法的设计</h5><pre><code>用dB6小波基8尺度分解信号，其近似信号的频带分布如表3所示：</code></pre><p>表3 8尺度分解子带系数的频率范围</p>
+<p>Tab.3 The frequency range of scale subband coefficients</p>
+<p><img src="http://oarap.org/wp-content/uploads/2016/02/b3.png" alt="b3"></p>
+<pre><code>尺度为8的近似信号部分频带为0~0.9765625Hz，此频段多为信号的基线漂移趋势。所以在小波分解后将a8信号（主要基线漂移信号）直接去除即可。dB6小波在8尺度下分解信号的近似部分波形如图6所示：</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8728.png" alt="图片28"></p>
+<p>图6 dB6小波在8尺度下分解信号的近似部分波形</p>
+<p>Fig. 6 DB6 approximation of wavelet decomposition in 8 signal waveform</p>
+<h3 id="3-Matlab仿真"><a href="#3-Matlab仿真" class="headerlink" title="3       Matlab仿真"></a>3       Matlab仿真</h3><pre><code>如图7所示为心电信号去噪系统在Matlab中对信号滤波前后的仿真对比图：可以发现100Hz以上以及工频50Hz的噪声被完全滤除；白噪声被消除，波形变得十分清晰；基线漂移现象被较好的抑制。</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/%E5%9B%BE%E7%89%8729.png" alt="图片29"></p>
+<p>图7 信号去噪前后的时域波形及频谱图</p>
+<p>Fig. 7 Signal denoising before and after the time domain waveform and spectrum diagram</p>
+<h3 id="4-结论"><a href="#4-结论" class="headerlink" title="4       结论"></a>4       结论</h3><pre><code>本文给出了基于MATLAB的心电信号去噪系统的设计方法：从带噪心电信号的读取及频谱分析，窗函数法设计FIR滤波器对心电信号进行预处理；运用小波去噪算法滤除信号中残存的白噪声；基线矫正算法用来抑制信号中由于呼吸、人身运动等带来的基线漂移现象。经验证该系统对大部分低信噪比的心电信号去噪效果十分显著。</code></pre><p><img src="http://oarap.org/wp-content/uploads/2016/02/QQ%E6%8B%BC%E9%9F%B3%E6%88%AA%E5%9B%BE%E6%9C%AA%E5%91%BD%E5%90%8D.png" alt="QQ拼音截图未命名"></p>
+<p>Matlab源代码和原始心电信号数据(20组)</p>
+<p>下载链接：<a href="http://oarap.org/wp-content/uploads/2016/02/源码数据_基于Matlab的心电信号去噪系统设计.rar" target="_blank" rel="noopener">源码&amp;数据_基于Matlab的心电信号去噪系统设计.rar</a></p>
+
+    </div>
+
+    
+    
+    
+      <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="/" alt="book诗意 wechat" style="width: 200px; max-width: 100%;">
+  <div></div>
+</div>
+
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/DSP/" rel="tag"># DSP</a>
+          
+            <a href="/tags/Matlab/" rel="tag"># Matlab</a>
+          
+            <a href="/tags/基线漂移/" rel="tag"># 基线漂移</a>
+          
+            <a href="/tags/小波去噪/" rel="tag"># 小波去噪</a>
+          
+            <a href="/tags/心电信号/" rel="tag"># 心电信号</a>
+          
+            <a href="/tags/数字信号处理/" rel="tag"># 数字信号处理</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2016/01/19/e5-9f-ba-e4-ba-8emsp430-e7-9a-84-e5-87-bd-e6-95-b0-e4-bf-a1-e5-8f-b7-e5-8f-91-e7-94-9f-e5-99-a8-e8-ae-be-e8-ae-a1/" rel="next" title="基于MSP430的函数信号发生器设计">
+                <i class="fa fa-chevron-left"></i> 基于MSP430的函数信号发生器设计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2016/06/13/e5-9f-ba-e4-ba-8estm32-e7-9a-84-e6-99-ba-e8-83-bd-e9-80-81-e9-a4-90-e7-b3-bb-e7-bb-9f/" rel="prev" title="基于STM32的智能送餐系统">
+                基于STM32的智能送餐系统 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">book诗意</p>
+  <div class="site-description motion-element" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-name">分类</span>
+        
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">90</span>
+        <span class="site-state-item-name">标签</span>
+        
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/bookshiyi" title="GitHub &rarr; https://github.com/bookshiyi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#0-引言"><span class="nav-number">1.</span> <span class="nav-text">0       引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-心电信号频谱分析"><span class="nav-number">2.</span> <span class="nav-text">1       心电信号频谱分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-心电心号的读取"><span class="nav-number">2.1.</span> <span class="nav-text">1.1         心电心号的读取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-心电心号频谱分析"><span class="nav-number">2.2.</span> <span class="nav-text">1.2         心电心号频谱分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-去噪系统设计"><span class="nav-number">3.</span> <span class="nav-text">2       去噪系统设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-FIR滤波器"><span class="nav-number">3.1.</span> <span class="nav-text">2.1         FIR滤波器</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-1-窗函数法设计思路"><span class="nav-number">3.1.1.</span> <span class="nav-text">2.1.1        窗函数法设计思路</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-2-FIR低通滤波器设计"><span class="nav-number">3.1.2.</span> <span class="nav-text">2.1.2        FIR低通滤波器设计</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-3-FIR工频陷波器设计"><span class="nav-number">3.1.3.</span> <span class="nav-text">2.1.3        FIR工频陷波器设计</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-小波去噪"><span class="nav-number">3.2.</span> <span class="nav-text">2.2         小波去噪</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-1-离散小波变换及重构"><span class="nav-number">3.2.1.</span> <span class="nav-text">2.2.1              离散小波变换及重构</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-小波去噪算法设计"><span class="nav-number">3.3.</span> <span class="nav-text">2.2.2              小波去噪算法设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-基线矫正"><span class="nav-number">3.4.</span> <span class="nav-text">2.3         基线矫正</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3-1-基线矫正的原理"><span class="nav-number">3.4.1.</span> <span class="nav-text">2.3.1              基线矫正的原理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3-2-基线矫正算法的设计"><span class="nav-number">3.4.2.</span> <span class="nav-text">2.3.2              基线矫正算法的设计</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Matlab仿真"><span class="nav-number">4.</span> <span class="nav-text">3       Matlab仿真</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-结论"><span class="nav-number">5.</span> <span class="nav-text">4       结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">辽ICP备16002243号-2 </a>&copy; 2016 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">book诗意</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+<script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+
+
+
+  
+
+
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  if (CONFIG.page.isPost) {
+    bookmark.scrollToMark('auto', "#更多");
+  } else {
+    bookmark.loadBookmark();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+</body>
+</html>
