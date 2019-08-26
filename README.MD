@@ -11,6 +11,7 @@
     * 目录结构
         * `themes/next`(submodule) 主题
         * `source` 文档源码
+        * `pulic` 编译后的静态网页 
     
     * 环境部署
         * https://hexo.io/zh-cn/docs/index.html
