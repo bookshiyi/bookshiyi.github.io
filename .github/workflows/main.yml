@@ -1,4 +1,4 @@
-name: hexo-workflow
+name: hexo-auto-deploy
 
 on: 
   push:
@@ -18,3 +18,20 @@ jobs:
       run: |
         echo Add other actions to build,
         echo test, and deploy your project.
+
+    steps:
+    - name: Clean
+      uses: heowc/action-hexo@master
+      with:
+        args: clean
+    - name: Generate
+      uses: heowc/action-hexo@master
+      with:
+        args: generate
+    - name: Deploy
+      uses: heowc/action-hexo@master
+      env:
+        EMAIL: ibookshiyi@gmail.com
+        NAME: bookshiyi
+      with:
+        args: deploy
