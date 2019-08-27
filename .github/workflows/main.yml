@@ -12,15 +12,15 @@ jobs:
 
     steps:
     - name: Clean
-      uses: heowc/action-hexo@master
+      uses: bookshiyi/action-hexo@master
       with:
         args: clean
     - name: Generate
-      uses: heowc/action-hexo@master
+      uses: bookshiyi/action-hexo@master
       with:
         args: generate
     - name: Deploy
-      uses: heowc/action-hexo@master
+      uses: bookshiyi/action-hexo@master
       env:
         EMAIL: ibookshiyi@gmail.com
         NAME: bookshiyi
